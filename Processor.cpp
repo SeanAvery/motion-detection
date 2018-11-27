@@ -56,8 +56,19 @@ int main(int argc, char *argv[]) {
     namedWindow(THRESH_WIN, WINDOW_AUTOSIZE);
 
     // frame matrix
-		Mat frame, grayFrame, blurFrame, prevFrame, diffFrame, threshFrame, hsvFrame;
+		Mat frame, grayFrame, blurFrame, prevFrame, diffFrame, threshFrame, hsvFrame, dilateFrame;
     int frameNum = -1;
+
+    // dilation setters
+    int dilationSize = 10;
+    int dilationType = MORPH_ELLIPSE;
+    Mat dilationKernel = getStructuringElement(
+        dilationType,
+        Size( 2*dilationSize + 1, 2 * dilationSize + 1),
+        Point( dilationSize, dilationSize ));
+
+    const char* DIL_WIN = "dilation_window";
+    namedWindow(DIL_WIN, WINDOW_AUTOSIZE);
 
     // iterate through frames
 		for (;;)
@@ -93,8 +104,12 @@ int main(int argc, char *argv[]) {
             // compute threshold
             // only taking high hsv vlaue pixels (65 to 100)
             inRange(hsvFrame, Scalar(0, 0, 64), Scalar(255, 255, 255), threshFrame);
-
+  
             imshow(THRESH_WIN, threshFrame);
+            
+            dilate(threshFrame, dilateFrame, dilationKernel);
+            
+            imshow(DIL_WIN, dilateFrame);
         }
 
         // frame counter increment
